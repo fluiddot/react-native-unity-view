@@ -90,11 +90,11 @@ export default class UnityView extends React.Component<UnityViewProps> {
      * @param method Method name to call.
      * @param args Arguments of the call.
      */
-    public postMessage(method: string, args: any) {
+    public postMessage(method: string, args?: any) {
         UIManager.dispatchViewManagerCommand(
             this.getViewHandle(),
             UIManager.UnityView.Commands.postMessage,
-            ['RNListener', 'CallFromNative', JSON.stringify(args)]
+            ['RNListener', 'CallFromNative', JSON.stringify({method, arguments: args})]
         );
     };
 

@@ -76,7 +76,7 @@ var UnityView = /** @class */ (function (_super) {
      * @param args Arguments of the call.
      */
     UnityView.prototype.postMessage = function (method, args) {
-        UIManager.dispatchViewManagerCommand(this.getViewHandle(), UIManager.UnityView.Commands.postMessage, ['RNListener', 'CallFromNative', JSON.stringify(args)]);
+        UIManager.dispatchViewManagerCommand(this.getViewHandle(), UIManager.UnityView.Commands.postMessage, ['RNListener', 'CallFromNative', JSON.stringify({ method: method, arguments: args })]);
     };
     ;
     /**
