@@ -22,7 +22,7 @@ void UnityResumeCommand();
 #endif
 
 @protocol UnityEventListener <NSObject>
-- (void)onMessage:(NSString *)message;
+- (void)onMessage:(NSDictionary *)message;
 @end
 
 @interface UnityUtils : NSObject

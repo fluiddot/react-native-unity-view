@@ -82,8 +82,10 @@ static NSHashTable* mUnityEventListeners = [NSHashTable weakObjectsHashTable];
 
 extern "C" void onUnityMessage(const char* message)
 {
+    NSData *objectData = [[NSString stringWithUTF8String:message] dataUsingEncoding:NSUTF8StringEncoding];
+    NSDictionary *json = [NSJSONSerialization JSONObjectWithData:objectData options:NSJSONReadingMutableContainers error:nil];
     for (id<UnityEventListener> listener in mUnityEventListeners) {
-        [listener onMessage:[NSString stringWithUTF8String:message]];
+        [listener onMessage: json];
     }
 }
 
