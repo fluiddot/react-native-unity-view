@@ -33,11 +33,18 @@ export default class UnityView extends React.Component<UnityViewProps> {
     static propTypes: any;
     /**
      * Send Message to Unity.
+     * This message will be handled by the RNListener in Unity.
+     * @param method Method name to call.
+     * @param args Arguments of the call.
+     */
+    postMessage(method: string, args: string): void;
+    /**
+     * Send Global Message to Unity.
      * @param gameObject The Name of GameObject. Also can be a path string.
      * @param methodName Method name in GameObject instance.
      * @param message The message will post.
      */
-    postMessage(gameObject: string, methodName: string, message: string): void;
+    postGlobalMessage(gameObject: string, methodName: string, message: string): void;
     /**
      * Pause the unity player
      */

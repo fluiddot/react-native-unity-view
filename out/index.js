@@ -71,11 +71,21 @@ var UnityView = /** @class */ (function (_super) {
     }
     /**
      * Send Message to Unity.
+     * This message will be handled by the RNListener in Unity.
+     * @param method Method name to call.
+     * @param args Arguments of the call.
+     */
+    UnityView.prototype.postMessage = function (method, args) {
+        UIManager.dispatchViewManagerCommand(this.getViewHandle(), UIManager.UnityView.Commands.postMessage, ['RNListener', 'CallFromNative', args]);
+    };
+    ;
+    /**
+     * Send Global Message to Unity.
      * @param gameObject The Name of GameObject. Also can be a path string.
      * @param methodName Method name in GameObject instance.
      * @param message The message will post.
      */
-    UnityView.prototype.postMessage = function (gameObject, methodName, message) {
+    UnityView.prototype.postGlobalMessage = function (gameObject, methodName, message) {
         UIManager.dispatchViewManagerCommand(this.getViewHandle(), UIManager.UnityView.Commands.postMessage, [String(gameObject), String(methodName), String(message)]);
     };
     ;
@@ -99,14 +109,14 @@ var UnityView = /** @class */ (function (_super) {
      */
     UnityView.prototype.postMessageToUnityManager = function (message) {
         if (typeof message === 'string') {
-            this.postMessage('UnityMessageManager', 'onMessage', message);
+            this.postGlobalMessage('UnityMessageManager', 'onMessage', message);
         }
         else {
             var id = generateId();
             if (message.callBack) {
                 waitCallbackMessageMap[id] = message;
             }
-            this.postMessage('UnityMessageManager', 'onRNMessage', messagePrefix + JSON.stringify({
+            this.postGlobalMessage('UnityMessageManager', 'onRNMessage', messagePrefix + JSON.stringify({
                 id: id,
                 seq: message.callBack ? 'start' : '',
                 name: message.name,
