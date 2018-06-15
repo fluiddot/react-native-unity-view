@@ -86,11 +86,25 @@ export default class UnityView extends React.Component<UnityViewProps> {
 
     /**
      * Send Message to Unity.
+     * This message will be handled by the RNListener in Unity.
+     * @param method Method name to call.
+     * @param args Arguments of the call.
+     */
+    public postMessage(method: string, args: string) {
+        UIManager.dispatchViewManagerCommand(
+            this.getViewHandle(),
+            UIManager.UnityView.Commands.postMessage,
+            ['RNListener', 'CallFromNative', args]
+        );
+    };
+
+    /**
+     * Send Global Message to Unity.
      * @param gameObject The Name of GameObject. Also can be a path string.
      * @param methodName Method name in GameObject instance.
      * @param message The message will post.
      */
-    public postMessage(gameObject: string, methodName: string, message: string) {
+    public postGlobalMessage(gameObject: string, methodName: string, message: string) {
         UIManager.dispatchViewManagerCommand(
             this.getViewHandle(),
             UIManager.UnityView.Commands.postMessage,
@@ -126,13 +140,13 @@ export default class UnityView extends React.Component<UnityViewProps> {
      */
     public postMessageToUnityManager(message: string | UnityViewMessage) {
         if (typeof message === 'string') {
-            this.postMessage('UnityMessageManager', 'onMessage', message);
+            this.postGlobalMessage('UnityMessageManager', 'onMessage', message);
         } else {
             const id = generateId();
             if (message.callBack) {
                 waitCallbackMessageMap[id] = message;
             }
-            this.postMessage('UnityMessageManager', 'onRNMessage', messagePrefix + JSON.stringify({
+            this.postGlobalMessage('UnityMessageManager', 'onRNMessage', messagePrefix + JSON.stringify({
                 id: id,
                 seq: message.callBack ? 'start' : '',
                 name: message.name,
