@@ -165,10 +165,12 @@ export default class UnityView extends React.Component<UnityViewProps> {
             if (this.props.onUnityMessage) {
                 this.props.onUnityMessage(handler);
             }
-        } else {
+        }else if(typeof(message) === 'object') {
             if (this.props.onMessage) {
-                this.props.onMessage(message);
+                this.props.onMessage(message as any);
             }
+        } else {
+            throw new Error(`message type ${typeof(message)} not supported`);
         }
     }
 
