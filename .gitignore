@@ -67,3 +67,6 @@ android/*.iml
 /android/.project
 /android/.settings
 /out
+
+# Unity
+*.meta
