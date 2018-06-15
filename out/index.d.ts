@@ -37,7 +37,7 @@ export default class UnityView extends React.Component<UnityViewProps> {
      * @param method Method name to call.
      * @param args Arguments of the call.
      */
-    postMessage(method: string, args: string): void;
+    postMessage(method: string, args: any): void;
     /**
      * Send Global Message to Unity.
      * @param gameObject The Name of GameObject. Also can be a path string.
