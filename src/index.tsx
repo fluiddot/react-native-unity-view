@@ -11,6 +11,11 @@ export interface UnityViewMessageEventData {
     message: string;
 }
 
+export interface IUnityToReactMessage {
+    method: string;
+    arguments: any;
+}
+
 export interface UnityViewMessage {
     name: string;
     data: any;
@@ -33,7 +38,7 @@ export interface UnityViewProps extends ViewProperties {
     /** 
      * Receive message from unity. 
      */
-    onMessage?: (message: string) => void;
+    onMessage?: (message: IUnityToReactMessage) => void;
     onUnityMessage?: (handler: MessageHandler) => void;
 }
 
@@ -142,7 +147,7 @@ export default class UnityView extends React.Component<UnityViewProps> {
 
     private onMessage(event: NativeSyntheticEvent<UnityViewMessageEventData>) {
         let message = event.nativeEvent.message
-        if (message.startsWith(messagePrefix)) {
+        if (typeof(message) === 'string' && message.startsWith(messagePrefix)) {
             message = message.replace(messagePrefix, '');
 
             const handler = MessageHandler.deserialize(this.getViewHandle(), message);
