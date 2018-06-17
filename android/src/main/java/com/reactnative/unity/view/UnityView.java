@@ -14,6 +14,7 @@ import org.json.JSONObject;
 
 /**
  * Created by xzper on 2018-02-07.
+ * Edited by fluiddot 2018-06-17
  */
 
 public class UnityView extends FrameLayout implements UnityEventListener {

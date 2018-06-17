@@ -17,6 +17,7 @@ import static android.view.ViewGroup.LayoutParams.MATCH_PARENT;
 
 /**
  * Created by xzper on 2018-03-08.
+ * Edited by fluiddot 2018-06-17
  */
 
 public class UnityUtils {

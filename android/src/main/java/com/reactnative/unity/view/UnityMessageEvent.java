@@ -9,6 +9,7 @@ import org.json.JSONObject;
 
 /**
  * Created by xzper on 2018-03-08.
+ * Edited by fluiddot 2018-06-17
  */
 
 public class UnityMessageEvent extends Event<UnityMessageEvent> {

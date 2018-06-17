@@ -17,6 +17,7 @@ import javax.annotation.Nullable;
 
 /**
  * Created by xzper on 2018-02-07.
+ * Edited by fluiddot 2018-06-17
  */
 
 public class UnityViewManager extends SimpleViewManager<UnityView> implements LifecycleEventListener, View.OnAttachStateChangeListener {
