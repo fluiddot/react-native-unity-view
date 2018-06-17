@@ -94,7 +94,7 @@ Example:
 
 ```
 RNBridge.Instance.CallToNative(new RNMessage("method", new Dictionary<string, object>(){
-	{"agument1", value1},
+	{"argument1", value1},
 	{"argument2", value2}
 }));
 ```
@@ -129,7 +129,7 @@ Send message to unity.
 
 Example:
 
-1. Add a message handle method in `MonoBehaviour`.
+1. Add a listener in a component:
 
 ```
 public class MyComponent : MonoBehaviour {
@@ -146,9 +146,7 @@ public class MyComponent : MonoBehaviour {
 }
 ```
 
-2. Add Unity component to a GameObject.
-
-3. Send message use javascript.
+2. Send message from react native:
 
 ```
 onPress = () => {
