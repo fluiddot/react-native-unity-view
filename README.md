@@ -2,20 +2,13 @@
 
 Integrate unity3d within a React Native app. Add a react native component to show unity. Works on both iOS and Android.
 
-## Example
-
-See [react-native-unity-demo](https://github.com/f111fei/react-native-unity-demo)
-
-## Preview
-
-![gif](https://user-images.githubusercontent.com/7069719/37143096-12be6810-22f5-11e8-89d8-562e9213072e.gif)
-
 ## How to use
 
 ### Install
 
 ```
-npm install react-native-unity-view --save
+npm install git://github.com/fluiddot/react-native-unity-view.git --save
+(original) npm install react-native-unity-view --save
 
 react-native link react-native-unity-view
 ```
@@ -24,7 +17,7 @@ react-native link react-native-unity-view
 
 1. Create an unity project, Example: 'Cube'.
 2. Create a folder named `unity` in react native project folder.
-2. Move unity project folder to `unity` folder.
+3. Move unity project folder to `unity` folder.
 
 Now your project files should look like this.
 
@@ -42,18 +35,19 @@ Now your project files should look like this.
 ### Configure Player Settings
 
 1. First Open Unity Project.
-
 2. Click Menu: File => Build Settings => Player Settings
+3. Add RNBridge.package from `node_modules/react-native-unity-view/unity/RNBridge.unitypackage`
+4. Setup export settings in: `unity/Assets/RNBridge/Editor/ExportSettings`
 
-3. Change `Product Name` to Name of the Xcode project, You can find it follow `ios/${XcodeProjectName}.xcodeproj`.
+- `Xcode project Name`: Your react native xcode project name
+- `iOS Build Mode`: Change this depending whether you want to build for device or simulator
+- `iOS Build Type`: Debug or Release
 
 **IOS Platform**:
 
 Other Settings find the Rendering part, uncheck the `Auto Graphics API` and select only `OpenGLES2`.
 
-### Add Unity Build Scripts and Export
-
-Copy [`Build.cs`](https://github.com/f111fei/react-native-unity-demo/blob/master/unity/Cube/Assets/Scripts/Editor/Build.cs) and [`XCodePostBuild.cs`](https://github.com/f111fei/react-native-unity-demo/blob/master/unity/Cube/Assets/Scripts/Editor/XCodePostBuild.cs) to `unity/<Your Unity Project>/Assets/Scripts/Editor/`
+### Build
 
 Open your unity project in Unity Editor. Now you can export unity project with `Build/Export Android` or `Build/Export IOS` menu.
 
@@ -80,17 +74,10 @@ project(":UnityExport").projectDir = file("./UnityExport")
 #### IOS Build
 
 1. Open your react native project in XCode.
-
-1. Copy File [`UnityConfig.xcconfig`](https://github.com/f111fei/react-native-unity-demo/blob/master/ios/rnunitydemo/UnityConfig.xcconfig) to `ios/${XcodeProjectName}/`.
-
-2. Drag `UnityConfig.xcconfig` to XCode. Choose `Create folder references`.
-
+2. Drag `node_modules/react-native-unity-view/ios/Config.xcconfig` to yout XCode project. Choose `Create folder references`.
 3. Setting `.xcconfig` to project.
-
 ![image](https://user-images.githubusercontent.com/7069719/37093471-638b7810-224a-11e8-8263-b9882f707c15.png)
-
 4. Go to Targets => Build Settings. Change `Dead Code Stripping` to `YES`.
-
 ![image](https://user-images.githubusercontent.com/7069719/37325486-182c7bd4-26c9-11e8-9fc0-8e1a149d30b2.png)
 
 ### Use In React Native
@@ -100,8 +87,6 @@ project(":UnityExport").projectDir = file("./UnityExport")
 ##### `onMessage`
 
 Receive message from unity.
-
-Please copy [`UnityMessageManager.cs`](https://github.com/f111fei/react-native-unity-demo/blob/master/unity/Cube/Assets/Scripts/UnityMessageManager.cs) to your unity project and rebuild first.
 
 Example:
 
