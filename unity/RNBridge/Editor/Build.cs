@@ -18,7 +18,7 @@ public class Build : MonoBehaviour
     public static void DoBuildAndroid()
     {
         string buildPath = Path.Combine(apkPath, Application.productName);
-        string exportPath = Path.GetFullPath(Path.Combine(ProjectPath, "../../android/UnityExport"));
+        string exportPath = Path.GetFullPath(Path.Combine(ProjectPath, "../android/UnityExport"));
 
         if (Directory.Exists(apkPath))
             Directory.Delete(apkPath, true);
@@ -27,6 +27,8 @@ public class Build : MonoBehaviour
             Directory.Delete(exportPath, true);
 
         EditorUserBuildSettings.androidBuildSystem = AndroidBuildSystem.Gradle;
+
+        UnityEngine.Debug.LogFormat("BUILDING Android - {0}", exportPath);
 
         var options = BuildOptions.AcceptExternalModificationsToPlayer;
         var status = BuildPipeline.BuildPlayer(
