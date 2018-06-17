@@ -7,75 +7,16 @@ const { UIManager } = NativeModules;
 
 const UNITY_VIEW_REF = 'unityview';
 
-export interface UnityViewMessageEventData {
-    message: string;
-}
-
-export interface IUnityToReactMessage {
+export interface IUnityMessage {
     method: string;
     arguments: any;
 }
-
-export interface UnityViewMessage {
-    name: string;
-    data: any;
-    callBack?: (data: any) => void;
-}
-
-let sequence = 0;
-function generateId() {
-    sequence = sequence + 1;
-    return sequence;
-}
-
-const waitCallbackMessageMap: {
-    [id: number]: UnityViewMessage
-} = {};
-
-const messagePrefix = '@UnityMessage@';
 
 export interface UnityViewProps extends ViewProperties {
     /** 
      * Receive message from unity. 
      */
-    onMessage?: (message: IUnityToReactMessage) => void;
-    onUnityMessage?: (handler: MessageHandler) => void;
-}
-
-export class MessageHandler {
-    public static deserialize(viewHandler: number, message: string) {
-        const m = JSON.parse(message);
-        const handler = new MessageHandler(viewHandler);
-        handler.id = m.id;
-        handler.seq = m.seq;
-        handler.name = m.name;
-        handler.data = m.data;
-        return handler;
-    }
-
-    public id: number;
-    public seq: 'start' | 'end' | '';
-    public name: string;
-    public data: any;
-
-    private viewHandler: number;
-
-    constructor(viewHandler: number) {
-        this.viewHandler = viewHandler;
-    }
-
-    public send(data: any) {
-        UIManager.dispatchViewManagerCommand(
-            this.viewHandler,
-            UIManager.UnityView.Commands.postMessage,
-            ['UnityMessageManager', 'onUnityMessage', messagePrefix + JSON.stringify({
-                id: this.id,
-                seq: 'end',
-                name: this.name,
-                data: data
-            })]
-        );
-    }
+    onMessage?: (message: IUnityMessage) => void;
 }
 
 export default class UnityView extends React.Component<UnityViewProps> {
@@ -95,20 +36,6 @@ export default class UnityView extends React.Component<UnityViewProps> {
             this.getViewHandle(),
             UIManager.UnityView.Commands.postMessage,
             ['RNListener', 'CallFromNative', JSON.stringify({method, arguments: args})]
-        );
-    };
-
-    /**
-     * Send Global Message to Unity.
-     * @param gameObject The Name of GameObject. Also can be a path string.
-     * @param methodName Method name in GameObject instance.
-     * @param message The message will post.
-     */
-    public postGlobalMessage(gameObject: string, methodName: string, message: string) {
-        UIManager.dispatchViewManagerCommand(
-            this.getViewHandle(),
-            UIManager.UnityView.Commands.postMessage,
-            [String(gameObject), String(methodName), String(message)]
         );
     };
 
@@ -134,57 +61,14 @@ export default class UnityView extends React.Component<UnityViewProps> {
         );
     };
 
-    /**
-     * Send Message to UnityMessageManager.
-     * @param message The message will post.
-     */
-    public postMessageToUnityManager(message: string | UnityViewMessage) {
-        if (typeof message === 'string') {
-            this.postGlobalMessage('UnityMessageManager', 'onMessage', message);
-        } else {
-            const id = generateId();
-            if (message.callBack) {
-                waitCallbackMessageMap[id] = message;
-            }
-            this.postGlobalMessage('UnityMessageManager', 'onRNMessage', messagePrefix + JSON.stringify({
-                id: id,
-                seq: message.callBack ? 'start' : '',
-                name: message.name,
-                data: message.data
-            }));
-        }
-    };
-
     private getViewHandle() {
         return findNodeHandle(this.refs[UNITY_VIEW_REF] as any);
     }
 
-    private onMessage(event: NativeSyntheticEvent<UnityViewMessageEventData>) {
-        let message = event.nativeEvent.message
-        if (typeof(message) === 'string' && message.startsWith(messagePrefix)) {
-            message = message.replace(messagePrefix, '');
-
-            const handler = MessageHandler.deserialize(this.getViewHandle(), message);
-
-            if (handler.seq === 'end') {
-                // handle callback message
-                const m = waitCallbackMessageMap[handler.id];
-                delete waitCallbackMessageMap[handler.id];
-                if (m && m.callBack != null) {
-                    m.callBack(handler.data);
-                }
-                return;
-            }
-
-            if (this.props.onUnityMessage) {
-                this.props.onUnityMessage(handler);
-            }
-        }else if(typeof(message) === 'object') {
-            if (this.props.onMessage) {
-                this.props.onMessage(message as any);
-            }
-        } else {
-            throw new Error(`message type ${typeof(message)} not supported`);
+    private onMessage(event: NativeSyntheticEvent<IUnityMessage>) {
+        const message = event.nativeEvent
+        if (this.props.onMessage) {
+            this.props.onMessage(message);
         }
     }
 

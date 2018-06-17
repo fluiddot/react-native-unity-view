@@ -33,37 +33,6 @@ var PropTypes = require("prop-types");
 var ViewPropTypes = require("react-native/Libraries/Components/View/ViewPropTypes");
 var UIManager = react_native_1.NativeModules.UIManager;
 var UNITY_VIEW_REF = 'unityview';
-var sequence = 0;
-function generateId() {
-    sequence = sequence + 1;
-    return sequence;
-}
-var waitCallbackMessageMap = {};
-var messagePrefix = '@UnityMessage@';
-var MessageHandler = /** @class */ (function () {
-    function MessageHandler(viewHandler) {
-        this.viewHandler = viewHandler;
-    }
-    MessageHandler.deserialize = function (viewHandler, message) {
-        var m = JSON.parse(message);
-        var handler = new MessageHandler(viewHandler);
-        handler.id = m.id;
-        handler.seq = m.seq;
-        handler.name = m.name;
-        handler.data = m.data;
-        return handler;
-    };
-    MessageHandler.prototype.send = function (data) {
-        UIManager.dispatchViewManagerCommand(this.viewHandler, UIManager.UnityView.Commands.postMessage, ['UnityMessageManager', 'onUnityMessage', messagePrefix + JSON.stringify({
-                id: this.id,
-                seq: 'end',
-                name: this.name,
-                data: data
-            })]);
-    };
-    return MessageHandler;
-}());
-exports.MessageHandler = MessageHandler;
 var UnityView = /** @class */ (function (_super) {
     __extends(UnityView, _super);
     function UnityView() {
@@ -80,16 +49,6 @@ var UnityView = /** @class */ (function (_super) {
     };
     ;
     /**
-     * Send Global Message to Unity.
-     * @param gameObject The Name of GameObject. Also can be a path string.
-     * @param methodName Method name in GameObject instance.
-     * @param message The message will post.
-     */
-    UnityView.prototype.postGlobalMessage = function (gameObject, methodName, message) {
-        UIManager.dispatchViewManagerCommand(this.getViewHandle(), UIManager.UnityView.Commands.postMessage, [String(gameObject), String(methodName), String(message)]);
-    };
-    ;
-    /**
      * Pause the unity player
      */
     UnityView.prototype.pause = function () {
@@ -103,56 +62,13 @@ var UnityView = /** @class */ (function (_super) {
         UIManager.dispatchViewManagerCommand(this.getViewHandle(), UIManager.UnityView.Commands.resume, []);
     };
     ;
-    /**
-     * Send Message to UnityMessageManager.
-     * @param message The message will post.
-     */
-    UnityView.prototype.postMessageToUnityManager = function (message) {
-        if (typeof message === 'string') {
-            this.postGlobalMessage('UnityMessageManager', 'onMessage', message);
-        }
-        else {
-            var id = generateId();
-            if (message.callBack) {
-                waitCallbackMessageMap[id] = message;
-            }
-            this.postGlobalMessage('UnityMessageManager', 'onRNMessage', messagePrefix + JSON.stringify({
-                id: id,
-                seq: message.callBack ? 'start' : '',
-                name: message.name,
-                data: message.data
-            }));
-        }
-    };
-    ;
     UnityView.prototype.getViewHandle = function () {
         return react_native_1.findNodeHandle(this.refs[UNITY_VIEW_REF]);
     };
     UnityView.prototype.onMessage = function (event) {
-        var message = event.nativeEvent.message;
-        if (typeof (message) === 'string' && message.startsWith(messagePrefix)) {
-            message = message.replace(messagePrefix, '');
-            var handler = MessageHandler.deserialize(this.getViewHandle(), message);
-            if (handler.seq === 'end') {
-                // handle callback message
-                var m = waitCallbackMessageMap[handler.id];
-                delete waitCallbackMessageMap[handler.id];
-                if (m && m.callBack != null) {
-                    m.callBack(handler.data);
-                }
-                return;
-            }
-            if (this.props.onUnityMessage) {
-                this.props.onUnityMessage(handler);
-            }
-        }
-        else if (typeof (message) === 'object') {
-            if (this.props.onMessage) {
-                this.props.onMessage(message);
-            }
-        }
-        else {
-            throw new Error("message type " + typeof (message) + " not supported");
+        var message = event.nativeEvent;
+        if (this.props.onMessage) {
+            this.props.onMessage(message);
         }
     };
     UnityView.prototype.render = function () {
