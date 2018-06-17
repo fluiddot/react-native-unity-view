@@ -34,11 +34,9 @@
     [self.uView setNeedsLayout];
 }
 
-- (void)onMessage:(NSString *)message {
+- (void)onMessage:(NSDictionary *)message {
     if (_onMessage) {
-        _onMessage(@{
-            @"message": message,
-        });
+        _onMessage(message);
     }
 }
 
