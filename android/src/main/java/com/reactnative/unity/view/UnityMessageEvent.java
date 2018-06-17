@@ -5,6 +5,8 @@ import com.facebook.react.bridge.WritableMap;
 import com.facebook.react.uimanager.events.Event;
 import com.facebook.react.uimanager.events.RCTEventEmitter;
 
+import org.json.JSONObject;
+
 /**
  * Created by xzper on 2018-03-08.
  */
@@ -12,9 +14,9 @@ import com.facebook.react.uimanager.events.RCTEventEmitter;
 public class UnityMessageEvent extends Event<UnityMessageEvent> {
 
     public static final String EVENT_NAME = "unityMessage";
-    private final String mData;
+    private final JSONObject mData;
 
-    public UnityMessageEvent(int viewId, String data) {
+    public UnityMessageEvent(int viewId, JSONObject data) {
         super(viewId);
         mData = data;
     }
@@ -26,8 +28,14 @@ public class UnityMessageEvent extends Event<UnityMessageEvent> {
 
     @Override
     public void dispatch(RCTEventEmitter rctEventEmitter) {
-        WritableMap data = Arguments.createMap();
-        data.putString("message", mData);
+        WritableMap data = null;
+        try {
+            data = JsonHelper.convertJsonToMap(mData);
+        }
+        catch(org.json.JSONException exception) {
+          System.out.println("JSON parse exception: " + exception);
+        }
+
         rctEventEmitter.receiveEvent(getViewTag(), EVENT_NAME, data);
     }
 }

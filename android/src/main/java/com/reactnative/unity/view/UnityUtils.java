@@ -11,6 +11,8 @@ import com.unity3d.player.UnityPlayer;
 
 import java.util.concurrent.CopyOnWriteArraySet;
 
+import org.json.JSONObject;
+
 import static android.view.ViewGroup.LayoutParams.MATCH_PARENT;
 
 /**
@@ -77,9 +79,17 @@ public class UnityUtils {
      * Invoke by unity C#
      */
     public static void onUnityMessage(String message) {
+        JSONObject jsonObject = new JSONObject();
+        try {
+          jsonObject = new JSONObject(message);
+        }
+        catch(org.json.JSONException exception) {
+          System.out.println("JSON parse exception: " + exception);
+        }
+
         for (UnityEventListener listener : mUnityEventListeners) {
             try {
-                listener.onMessage(message);
+                listener.onMessage(jsonObject);
             } catch (Exception e) {
             }
         }

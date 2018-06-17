@@ -10,6 +10,8 @@ import com.facebook.react.uimanager.events.Event;
 import com.facebook.react.uimanager.events.EventDispatcher;
 import com.unity3d.player.UnityPlayer;
 
+import org.json.JSONObject;
+
 /**
  * Created by xzper on 2018-02-07.
  */
@@ -48,7 +50,7 @@ public class UnityView extends FrameLayout implements UnityEventListener {
     }
 
     @Override
-    public void onMessage(String message) {
+    public void onMessage(JSONObject message) {
         dispatchEvent(this, new UnityMessageEvent(this.getId(), message));
     }
 
