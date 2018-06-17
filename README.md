@@ -93,14 +93,17 @@ Example:
 1. Send Message use C#.
 
 ```
-UnityMessageManager.Instance.SendMessageToRN("click");
+RNBridge.Instance.CallToNative(new RNMessage("method", new Dictionary<string, object>(){
+	{"agument1", value1},
+	{"argument2", value2}
+}));
 ```
 
 2. Receive Message in javascript
 
 ```
-onMessage(event) {
-    console.log('OnUnityMessage: ' + event.nativeEvent.message);    // OnUnityMessage: click
+onMessage = (message) => {
+    console.log('UnityMessage:', message.method, message.arguments);
 }
 
 render() {
@@ -108,7 +111,7 @@ render() {
         <View style={[styles.container]}>
             <UnityView
                 style={style.unity}
-                onMessage={this.onMessage.bind(this)}
+                onMessage={this.onMessage}
             />
         </View>
     );
@@ -117,22 +120,28 @@ render() {
 
 #### Methods
 
-##### `postMessage(gameObject: string, methodName: string, message: string)`
+##### `postMessage(method: string, arguments?: any)`
 
 Send message to unity.
 
-* `gameObject` The Name of GameObject. Also can be a path string.
-* `methodName` Method name in GameObject instance.
-* `message` The message will post.
+* `method` The method you want to call.
+* `arguments` Arguments of the method.
 
 Example:
 
 1. Add a message handle method in `MonoBehaviour`.
 
 ```
-public class Rotate : MonoBehaviour {
-    void handleMessage(string message) {
-		Debug.Log("onMessage:" + message);
+public class MyComponent : MonoBehaviour {
+	public void Start() {
+		RNBridge.Instance.OnCallFromNative += OnCallFromNative;
+	}
+	
+	void OnCallFromNative(RNMessage message) {
+		string method = message.method;
+		string argument1 = message.arguments.ToString("argument1");
+		int argument2 = message.arguments.ToInt("argument2");
+		...
 	}
 }
 ```
@@ -142,10 +151,9 @@ public class Rotate : MonoBehaviour {
 3. Send message use javascript.
 
 ```
-onToggleRotate() {
+onPress = () => {
     if (this.unity) {
-      // gameobject param also can be 'Cube'.
-      this.unity.postMessage('GameObject/Cube', 'toggleRotate', 'message');
+      this.unity.postMessage('method', {argument1: 'value1', argument2: 0});
     }
 }
 
@@ -156,67 +164,11 @@ render() {
                 ref={(ref) => this.unity = ref}
                 style={style.unity}
             />
-            <Button label="Toggle Rotate" onPress={this.onToggleRotate.bind(this)} />
+            <Button onPress={this.onPress} />
         </View>
     );
 }
 
-```
-
-##### `postMessageToUnityManager(message: string)`
-
-Send message to `UnityMessageManager`.
-
-Please copy [`UnityMessageManager.cs`](https://github.com/f111fei/react-native-unity-demo/blob/master/unity/Cube/Assets/Scripts/UnityMessageManager.cs) to your unity project and rebuild first.
-
-Same to `postMessage('UnityMessageManager', 'onMessage', message)`
-
-This is recommended to use.
-
-* `message` The message will post.
-
-Example:
-
-1. Add a message handle method in C#.
-
-```
-void Awake()
-{
-    UnityMessageManager.Instance.OnMessage += toggleRotate;
-}
-
-void onDestroy()
-{
-    UnityMessageManager.Instance.OnMessage -= toggleRotate;
-}
-
-void toggleRotate(string message)
-{
-    Debug.Log("onMessage:" + message);
-    canRotate = !canRotate;
-}
-```
-
-2. Send message use javascript.
-
-```
-onToggleRotate() {
-    if (this.unity) {
-      this.unity.postMessageToUnityManager('message');
-    }
-}
-
-render() {
-    return (
-        <View style={[styles.container]}>
-            <UnityView
-                ref={(ref) => this.unity = ref}
-                style={style.unity}
-            />
-            <Button label="Toggle Rotate" onPress={this.onToggleRotate.bind(this)} />
-        </View>
-    );
-}
 ```
 
 ##### `pause()`
